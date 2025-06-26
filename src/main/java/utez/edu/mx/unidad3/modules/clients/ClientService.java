@@ -22,6 +22,22 @@ public class ClientService {
 
         return new APIResponse("Operacion exitosa", list,false, HttpStatus.OK);
     }
+
+    @Transactional(readOnly = true)
+    public APIResponse findById(Long id) {
+        try{
+            Client found = clientRepository.findById(id).orElse(null);
+            if(found == null){
+                return new APIResponse("El usuario ya existe",true,HttpStatus.NOT_FOUND);
+            }
+            return new APIResponse("operacion exitosa", found, false, HttpStatus.OK);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse("No se pudo consultar",true,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @Transactional(rollbackFor = {SQLException.class,Exception.class})
     public APIResponse saveClient(Client payload){
         try{
@@ -35,4 +51,40 @@ public class ClientService {
             return new APIResponse("Error al crear el cliente",true,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Transactional(rollbackFor = {SQLException.class, Exception.class})
+    public APIResponse updateClient(Client payload) {
+        try{
+            Client found = clientRepository.findById(payload.getId()).orElse(null);
+            if(found == null){
+                return new APIResponse("El usuario ya existe",true,HttpStatus.NOT_FOUND);
+            }
+            clientRepository.save(payload);
+            return new APIResponse("Operacion Exitosa",false,HttpStatus.OK);
+        } catch(NullPointerException nullex){
+            nullex.printStackTrace();
+            return new APIResponse("No se aceptan nulos",true,HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return new APIResponse("Error al actualizar el cliente",true,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = {SQLException.class, Exception.class})
+    public APIResponse deleteClient(Client payload) {
+        try {
+            Client found = clientRepository.findById(payload.getId()).orElse(null);
+            if(found == null) {
+                return new APIResponse("El cliente no existe", true, HttpStatus.NOT_FOUND);
+            }
+            clientRepository.deleteById(found.getId());
+            return new APIResponse("Cliente eliminado correctamente", false, HttpStatus.OK);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            return new APIResponse("No se pudo eliinar cliente", true, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
