@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import utez.edu.mx.unidad3.modules.auth.dto.LoginRequestDTO;
+import utez.edu.mx.unidad3.modules.user.User;
 import utez.edu.mx.unidad3.utils.APIResponse;
 
 @RestController
@@ -21,4 +22,11 @@ public class AuthController {
         APIResponse response = authService.doLogin(payload);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<APIResponse> doRegister(@RequestBody User payload) {
+        APIResponse response = authService.register(payload);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 }
